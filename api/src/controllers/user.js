@@ -51,7 +51,7 @@ router.post("/signin", async (req, res) => {
       cookieOptions = { ...cookieOptions, secure: true, origin: "https://api-erasmus.cleverapps.io", sameSite: "none" };
     }
 
-    const token = jwt.sign({ _id: user.id }, config.secret, { expiresIn: JWT_MAX_AGE });
+    const token = jwt.sign({ _id: user.id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     res.cookie("jwt", token, cookieOptions);
 
     return res.status(200).send({ ok: true, token, user });
@@ -69,7 +69,7 @@ router.post("/signup", async (req, res) => {
       return res.status(400).send({ ok: false, user: null, code: PASSWORD_NOT_VALIDATED });
 
     const user = await UserObject.create({ name, password, email });
-    const token = jwt.sign({ _id: user._id }, config.secret, { expiresIn: JWT_MAX_AGE });
+    const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     const opts = {
       maxAge: COOKIE_MAX_AGE,
       secure: config.ENVIRONMENT === "development" ? false : true,

@@ -8,6 +8,8 @@
 
 3. Replace all `[boilerplate_name]` with your project's name
 
+4. Replace index.html information with your project's information
+
 ### API Installation
 
 1. Install the dependencies
