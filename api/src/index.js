@@ -42,14 +42,12 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.use(passport.initialize());
-
 app.use("/user", require("./controllers/user"));
 app.use("/file", require("./controllers/file"));
 app.use("/dummy", require("./controllers/dummy_controller"));
 
 app.use(handleError);
-require("./services/passport")();
+require("./services/passport")(app);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

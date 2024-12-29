@@ -8,9 +8,9 @@ import LoadingButton from '../../components/loadingButton'
 import api from '../../services/api'
 
 export default () => {
-  const [values, setValues] = useState({ email: 'deajace99@gmail.com', password: '12Selego.' })
+  const [values, setValues] = useState({ email: 'admin@selego.co', password: 'abc123$$' })
 
-  const { user } = store()
+  const { user, setUser } = store()
 
   const navigate = useNavigate()
 
@@ -18,7 +18,7 @@ export default () => {
     try {
       const { user, token } = await api.post(`/user/signin`, values)
       if (token) api.setToken(token)
-      if (user) dispatch(setUser(user))
+      if (user) setUser(user)
     } catch (e) {
       console.log('e', e)
       toast.error(e.code)
@@ -35,7 +35,7 @@ export default () => {
           try {
             const { user, token } = await api.post(`/user/signin`, values)
             if (token) api.setToken(token)
-            if (user) dispatch(setUser(user))
+            if (user) setUser(user)
           } catch (e) {
             console.log('e', e)
             toast.error(e.code)
