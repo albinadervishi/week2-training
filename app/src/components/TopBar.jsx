@@ -1,11 +1,11 @@
-import React, { Fragment, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { Fragment } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import { TbLogout } from 'react-icons/tb'
-import { LuUserCircle } from 'react-icons/lu'
 
 import useStore from '@/services/store'
 import api from '@/services/api'
+import { cn } from '@/utils'
 
 const TopBar = () => {
   return (
@@ -50,8 +50,11 @@ const ProfileMenu = () => {
         <Menu.Items className='absolute top-10 right-0 mt-2 rounded-b-md bg-white border p-2 z-10'>
           <Menu.Item>
             {({ active }) => (
-              <button className={`${active ? 'bg-gray-600' : 'bg-primary'} text-white w-44 flex items-center justify-between rounded-md px-4 py-2 text-sm`} onClick={handleLogout}>
-                Se deconnecter
+              <button
+                className={cn('text-white w-44 flex items-center justify-between rounded-md px-4 py-2 text-sm', active ? 'bg-gray-600' : 'bg-primary')}
+                onClick={handleLogout}
+              >
+                Se déconnecter
                 <TbLogout className='ml-2 h-5 w-5 text-white' aria-hidden='true' />
               </button>
             )}

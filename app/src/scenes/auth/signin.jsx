@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import store from '@/services/store'
 import toast from 'react-hot-toast'
 
-import LoadingButton from '../../components/loadingButton'
+import LoadingButton from '@/components/loadingButton'
 
-import api from '../../services/api'
+import api from '@/services/api'
 
 export default () => {
   const [values, setValues] = useState({ email: 'admin@selego.co', password: 'abc123$$' })

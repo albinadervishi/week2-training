@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-
+import { Link } from 'react-router-dom'
 import { AiOutlineHome } from 'react-icons/ai'
 
-import Logo from '@/assets/Logo-White.png'
+import Logo from '@/assets/logo.svg'
+
+import { cn } from '@/utils'
 
 const MENU = [{ title: 'Home', to: '/home', logo: <AiOutlineHome className='h-6 w-6' /> }]
 
@@ -24,11 +25,11 @@ const Navbar = () => {
             <Link
               to={menu.to}
               key={menu.title}
-              className={`w-full mb-3 px-3 py-3 rounded flex items-center ${selected === index ? 'bg-white text-primary' : 'text-white hover:bg-secondary hover:text-primary'}`}
+              className={cn('w-full mb-3 px-3 py-3 rounded flex items-center', selected === index ? 'bg-white text-primary' : 'text-white hover:bg-secondary hover:text-primary')}
               onClick={() => setSelected(index)}
             >
               {menu.logo}
-              <p className={`text-sm font-semibold text-center ml-3`}>{menu.title}</p>
+              <p className='text-sm font-semibold text-center ml-3'>{menu.title}</p>
             </Link>
           ))}
         </div>
