@@ -18,6 +18,20 @@ const { capture } = require("../services/sentry");
 const COOKIE_MAX_AGE = 31557600000;
 const JWT_MAX_AGE = "1y";
 
+const cookieOptions = () => {
+  if (config.ENVIRONMENT === "development") {
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: false, sameSite: "Lax" };
+  } else {
+    return {
+      maxAge: COOKIE_MAX_AGE,
+      httpOnly: true,
+      secure: true,
+      origin: "YOUR PROD URL",
+      sameSite: "none",
+    };
+  }
+};
+
 router.post("/signin", async (req, res) => {
   let { password, email } = req.body;
   email = (email || "").trim().toLowerCase();
@@ -34,15 +48,8 @@ router.post("/signin", async (req, res) => {
     user.set({ last_login_at: Date.now() });
     await user.save();
 
-    let cookieOptions = { maxAge: COOKIE_MAX_AGE, httpOnly: true };
-    if (config.ENVIRONMENT === "development") {
-      cookieOptions = { ...cookieOptions, secure: false, domain: "localhost", sameSite: "Lax" };
-    } else {
-      cookieOptions = { ...cookieOptions, secure: true, origin: "https://api-erasmus.cleverapps.io", sameSite: "none" };
-    }
-
     const token = jwt.sign({ _id: user.id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
-    res.cookie("jwt", token, cookieOptions);
+    res.cookie("jwt", token, cookieOptions());
 
     return res.status(200).send({ ok: true, token, user });
   } catch (error) {
@@ -60,12 +67,7 @@ router.post("/signup", async (req, res) => {
 
     const user = await UserObject.create({ name, password, email });
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
-    const opts = {
-      maxAge: COOKIE_MAX_AGE,
-      secure: config.ENVIRONMENT === "development" ? false : true,
-      httpOnly: false,
-    };
-    res.cookie("jwt", token, opts);
+    res.cookie("jwt", token, cookieOptions());
 
     return res.status(200).send({ user, token, ok: true });
   } catch (error) {
@@ -78,7 +80,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/logout", async (_, res) => {
   try {
-    res.clearCookie("jwt");
+    res.clearCookie("jwt", cookieOptions());
     return res.status(200).send({ ok: true });
   } catch (error) {
     capture(error);
@@ -91,7 +93,11 @@ router.get("/signin_token", passport.authenticate(["user", "admin"], { session: 
     const { user } = req;
     user.set({ last_login_at: Date.now() });
     await user.save();
-    return res.status(200).send({ user, token: req.cookies.jwt, ok: true });
+
+    const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
+    res.cookie("jwt", token, cookieOptions());
+
+    return res.status(200).send({ user, token, ok: true });
   } catch (error) {
     capture(error);
     return res.status(500).send({ ok: false, code: ERROR_CODES.SERVER_ERROR, error });
@@ -188,18 +194,19 @@ router.get("/", passport.authenticate(["admin", "user"], { session: false }), as
 
 router.post("/search", passport.authenticate(["admin", "user"], { session: false }), async (req, res) => {
   try {
+    const { search, sort, per_page, page } = req.body;
     let query = {};
 
-    const searchValue = req.body.search?.replace(/[#-.]|[[-^]|[?|{}]/g, "\\$&");
-    if (req.body.search) {
+    const searchValue = search?.replace(/[#-.]|[[-^]|[?|{}]/g, "\\$&");
+    if (search) {
       query = {
         ...query,
         $or: [{ name: { $regex: searchValue, $options: "i" } }, { email: { $regex: searchValue, $options: "i" } }],
       };
     }
 
-    const no_of_docs_each_page = req.body.per_page || 200;
-    const current_page_number = req.body.page - 1 || 0;
+    const no_of_docs_each_page = per_page || 200;
+    const current_page_number = page - 1 || 0;
 
     const users = await UserObject.find(query)
       .skip(no_of_docs_each_page * current_page_number)
