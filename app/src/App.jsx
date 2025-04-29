@@ -6,13 +6,11 @@ import * as Sentry from '@sentry/browser'
 import Auth from '@/scenes/auth'
 import Home from '@/scenes/home'
 
-import useStore from '@/services/store'
-
-import ResponsiveIndicator from '@/components/ResponsiveIndicator'
 import Navbar from '@/components/NavBar'
 import TopBar from '@/components/TopBar'
 import Loader from '@/components/loader'
 
+import useStore from '@/services/store'
 import api from '@/services/api'
 
 import { environment, SENTRY_URL } from './config'

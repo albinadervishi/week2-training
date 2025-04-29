@@ -2,9 +2,9 @@ import React, { useState, useRef, Fragment } from 'react'
 import { Popover, Transition } from '@headlessui/react'
 import { BiDotsVerticalRounded } from 'react-icons/bi'
 import { MdOutlineModeEdit, MdDeleteOutline } from 'react-icons/md'
-
-import api from '../services/api'
 import { AiFillFilePdf } from 'react-icons/ai'
+
+import api from '@/services/api'
 
 const FileInput = ({ value, onChange, name, folder }) => {
   const [loading, setLoading] = useState(false)

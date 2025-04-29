@@ -3,8 +3,9 @@ import queryString from 'query-string'
 import toast from 'react-hot-toast'
 import { useNavigate, useLocation } from 'react-router-dom'
 
-import api from '../../services/api'
-import LoadingButton from '../../components/loadingButton'
+import LoadingButton from '@/components/loadingButton'
+
+import api from '@/services/api'
 
 export default () => {
   const [values, setValues] = useState({ password: '', password1: '' })

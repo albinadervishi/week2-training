@@ -2,18 +2,16 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
-import LoadingButton from '../../components/loadingButton.jsx'
+import LoadingButton from '@/components/loadingButton'
 
 import store from '@/services/store'
-
-import api from '../../services/api.js'
+import api from '@/services/api'
+import { EP_Group_ensTrainNet3 } from '@/utils/constants'
 
 export default () => {
   const [values, setValues] = useState({ name: '', email: '', organisation_name: '', password: '' })
 
   const { user } = store()
-
-  const { EP_Group_ensTrainNet3 } = require('../../utils/constants.js')
 
   const navigate = useNavigate()
 
