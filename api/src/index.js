@@ -5,25 +5,14 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-
+const { initSentry, setupErrorHandler } = require("./services/sentry");
 const { PORT, ENVIRONMENT, APP_URL } = require("./config");
+
 const app = express();
+initSentry(app);
 
 if (ENVIRONMENT === "development") {
   app.use(morgan("tiny"));
-}
-
-// eslint-disable-next-line no-unused-vars
-function handleError(err, req, res, next) {
-  const output = {
-    error: {
-      name: err.name,
-      message: err.message,
-      text: err.toString(),
-    },
-  };
-  const statusCode = err.status || 500;
-  res.status(statusCode).json(output);
 }
 
 require("./services/mongo");
@@ -46,7 +35,7 @@ app.use("/user", require("./controllers/user"));
 app.use("/file", require("./controllers/file"));
 app.use("/dummy", require("./controllers/dummy_controller"));
 
-app.use(handleError);
+setupErrorHandler(app);
 require("./services/passport")(app);
 
 app.listen(PORT, () => {
