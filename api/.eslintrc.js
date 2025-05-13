@@ -23,7 +23,6 @@ module.exports = {
     "no-unused-vars": "off",
     "no-console": "off",
     "no-debugger": "off",
-    "no-var": "off",
     "prefer-const": "off",
     semi: "off",
     quotes: "off",
