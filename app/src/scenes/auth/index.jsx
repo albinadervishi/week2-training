@@ -4,7 +4,6 @@ import { Route, Routes } from "react-router-dom"
 import Reset from "./reset"
 import Forgot from "./forgot"
 import Signin from "./signin"
-import Signup from "./signup"
 
 const Auth = () => {
   return (
@@ -12,7 +11,6 @@ const Auth = () => {
       <Route path="/" element={<Signin />} />
       <Route path="/reset" element={<Reset />} />
       <Route path="/forgot" element={<Forgot />} />
-      <Route path="/signup" element={<Signup />} />
     </Routes>
   )
 }
