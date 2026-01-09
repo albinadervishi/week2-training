@@ -88,6 +88,28 @@ export default function MyEvents() {
     }
   }
 
+  const duplicateEvent = async event => {
+    try {
+      const { _id, organizer_id, organizer_name, organizer_email, created_at, updated_at, available_spots, ...eventData } = event
+
+      const duplicateData = {
+        ...eventData,
+        title: `Copy of ${event.title}`,
+        status: "published",
+        available_spots: event.capacity || 0
+      }
+
+      const { ok, data } = await api.post("/event", duplicateData)
+
+      if (!ok) throw new Error("Failed to duplicate event")
+      toast.success("Event duplicated! Add more details to publish it.")
+      getData()
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to duplicate event")
+    }
+  }
+
   const formatDate = date => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -264,6 +286,22 @@ export default function MyEvents() {
                               />
                             </svg>
                             View Attendees
+                          </button>
+                        )}
+                      </Menu.Item>
+
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => duplicateEvent(event)} className={`${active ? "bg-gray-100" : ""} flex items-center w-full px-4 py-2 text-sm text-gray-700`}>
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Duplicate Event
                           </button>
                         )}
                       </Menu.Item>
