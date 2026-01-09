@@ -165,19 +165,34 @@ function EventCard({ event }) {
     })
   }
 
+  const getSpotsInfo = () => {
+    if (!event.capacity || event.capacity === 0) return null
+
+    if (event.available_spots === 0) {
+      return { text: "SOLD OUT", className: "bg-red-100 text-red-700" }
+    } else {
+      return { text: `${event.available_spots} spots left`, className: "bg-green-100 text-green-700" }
+    }
+  }
+
+  const spotsInfo = getSpotsInfo()
+
   return (
     <Link to={`/event/${event._id}`} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden block">
       {event.image_url && <img src={event.image_url} alt={event.title} className="w-full h-48 object-cover" />}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
           <span className="inline-block px-2 py-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded">{event.category}</span>
-          {event.price > 0 ? (
-            <span className="text-sm font-bold text-gray-900">
-              {event.price} {event.currency}
-            </span>
-          ) : (
-            <span className="text-sm font-bold text-green-600">FREE</span>
-          )}
+          <div className="flex items-center gap-2">
+            {spotsInfo && <span className={`px-2 py-1 text-xs font-bold rounded ${spotsInfo.className}`}>{spotsInfo.text}</span>}
+            {event.price > 0 ? (
+              <span className="text-sm font-bold text-gray-900">
+                {event.price} {event.currency}
+              </span>
+            ) : (
+              <span className="text-sm font-bold text-green-600">FREE</span>
+            )}
+          </div>
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{event.title}</h3>
