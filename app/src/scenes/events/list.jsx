@@ -7,6 +7,7 @@ import toast from "react-hot-toast"
 export default function ListView() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [totalEvents, setTotalEvents] = useState(0)
   const [filters, setFilters] = useState({ search: "", category: "", city: "" })
   const [sort, setSort] = useState({ field: "start_date", order: 1 })
 
@@ -17,7 +18,7 @@ export default function ListView() {
   const fetchEvents = async () => {
     try {
       setLoading(true)
-      const { ok, data } = await api.post("/event/search", {
+      const { ok, data, total } = await api.post("/event/search", {
         search: filters.search,
         category: filters.category,
         city: filters.city,
@@ -28,6 +29,7 @@ export default function ListView() {
 
       if (!ok) throw new Error("Failed to fetch events")
       setEvents(data || [])
+      setTotalEvents(total || 0)
     } catch (error) {
       toast.error("Could not load events")
     } finally {
@@ -143,6 +145,13 @@ export default function ListView() {
           </div>
         </div>
       </form>
+
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Upcoming Events
+          {totalEvents > 0 && <span className="ml-2 text-sm font-normal text-gray-500">({totalEvents})</span>}
+        </h2>
+      </div>
 
       {/* Events List */}
       {events.length === 0 ? (
