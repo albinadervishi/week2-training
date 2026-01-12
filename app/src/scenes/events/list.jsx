@@ -13,13 +13,13 @@ export default function ListView() {
     fetchEvents()
   }, [])
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (filterParams = filters) => {
     try {
       setLoading(true)
       const { ok, data } = await api.post("/event/search", {
-        search: filters.search,
-        category: filters.category,
-        city: filters.city,
+        search: filterParams.search,
+        category: filterParams.category,
+        city: filterParams.city,
         per_page: 20,
         page: 1
       })
@@ -36,6 +36,11 @@ export default function ListView() {
   const handleSearch = e => {
     e.preventDefault()
     fetchEvents()
+  }
+  const handleReset = () => {
+    const emptyFilters = { search: "", category: "", city: "" }
+    setFilters(emptyFilters)
+    fetchEvents(emptyFilters)
   }
 
   if (loading) {
@@ -118,9 +123,18 @@ export default function ListView() {
             />
           </div>
         </div>
-        <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          Search Events
-        </button>
+        <div className="flex gap-2 mt-4">
+          <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Search Events
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            Reset
+          </button>
+        </div>
       </form>
 
       {/* Events List */}
