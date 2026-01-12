@@ -27,6 +27,4 @@ const CONFIG = {
   BREVO_KEY,
 };
 
-if (ENVIRONMENT === "development") console.log(CONFIG);
-
 module.exports = CONFIG;
