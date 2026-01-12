@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { AiOutlineCalendar, AiOutlineEnvironment, AiOutlineUser } from "react-icons/ai"
+import { AiOutlineCalendar, AiOutlineEnvironment, AiOutlineUser, AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai"
 import api from "@/services/api"
 import toast from "react-hot-toast"
 
@@ -8,10 +8,11 @@ export default function ListView() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ search: "", category: "", city: "" })
+  const [sort, setSort] = useState({ field: "start_date", order: 1 })
 
   useEffect(() => {
     fetchEvents()
-  }, [filters])
+  }, [filters, sort])
 
   const fetchEvents = async () => {
     try {
@@ -20,6 +21,7 @@ export default function ListView() {
         search: filters.search,
         category: filters.category,
         city: filters.city,
+        sort: { [sort.field]: sort.order },
         per_page: 20,
         page: 1
       })
@@ -80,7 +82,7 @@ export default function ListView() {
 
       {/* Search and Filters */}
       <form onSubmit={handleSearch} className="mb-6 bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <input
@@ -149,6 +151,27 @@ export default function ListView() {
                 {category}
               </button>
             ))}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
+            <div className="flex gap-2">
+              <select
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                value={sort.field}
+                onChange={e => setSort({ ...sort, field: e.target.value })}
+              >
+                <option value="start_date">Date</option>
+                <option value="price">Price</option>
+                <option value="capacity">Capacity</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => setSort({ ...sort, order: sort.order === 1 ? -1 : 1 })}
+                className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                title={sort.order === 1 ? "Ascending" : "Descending"}
+              >
+                {sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
+              </button>
+            </div>
           </div>
         </div>
       </form>
@@ -195,19 +218,34 @@ function EventCard({ event }) {
     })
   }
 
+  const getSpotsInfo = () => {
+    if (!event.capacity || event.capacity === 0) return null
+
+    if (event.available_spots === 0) {
+      return { text: "SOLD OUT", className: "bg-red-100 text-red-700" }
+    } else {
+      return { text: `${event.available_spots} spots left`, className: "bg-green-100 text-green-700" }
+    }
+  }
+
+  const spotsInfo = getSpotsInfo()
+
   return (
     <Link to={`/event/${event._id}`} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden block">
       {event.image_url && <img src={event.image_url} alt={event.title} className="w-full h-48 object-cover" />}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
           <span className="inline-block px-2 py-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded">{event.category}</span>
-          {event.price > 0 ? (
-            <span className="text-sm font-bold text-gray-900">
-              {event.price} {event.currency}
-            </span>
-          ) : (
-            <span className="text-sm font-bold text-green-600">FREE</span>
-          )}
+          <div className="flex items-center gap-2">
+            {spotsInfo && <span className={`px-2 py-1 text-xs font-bold rounded ${spotsInfo.className}`}>{spotsInfo.text}</span>}
+            {event.price > 0 ? (
+              <span className="text-sm font-bold text-gray-900">
+                {event.price} {event.currency}
+              </span>
+            ) : (
+              <span className="text-sm font-bold text-green-600">FREE</span>
+            )}
+          </div>
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{event.title}</h3>
@@ -247,7 +285,7 @@ function EventCard({ event }) {
                 </span>
               </div>
               <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${(event.available_spots / event.capacity) * 100}%` }}></div>
+                <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${((event.capacity - event.available_spots) / event.capacity) * 100}%` }}></div>
               </div>
             </div>
           )}
