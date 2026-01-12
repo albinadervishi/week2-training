@@ -13,8 +13,6 @@ function initSentry(app) {
 
     app.use(Sentry.Handlers.requestHandler());
     app.use(Sentry.Handlers.tracingHandler());
-
-    console.log("Sentry initialized");
   }
 }
 
