@@ -11,7 +11,7 @@ export default function ListView() {
 
   useEffect(() => {
     fetchEvents()
-  }, [])
+  }, [filters])
 
   const fetchEvents = async () => {
     try {
@@ -91,7 +91,7 @@ export default function ListView() {
               onChange={e => setFilters({ ...filters, search: e.target.value })}
             />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
             <select
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -106,7 +106,7 @@ export default function ListView() {
               <option value="social">Social</option>
               <option value="other">Other</option>
             </select>
-          </div>
+          </div> */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
             <input
@@ -117,10 +117,40 @@ export default function ListView() {
               onChange={e => setFilters({ ...filters, city: e.target.value })}
             />
           </div>
+          <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Search Events
+          </button>
         </div>
-        <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          Search Events
-        </button>
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setFilters({ ...filters, category: "" })
+              }}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                filters.category === "" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              All Categories
+            </button>
+            {["conference", "workshop", "seminar", "networking", "social", "other"].map(category => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => {
+                  setFilters({ ...filters, category })
+                }}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors capitalize ${
+                  filters.category === category ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
       </form>
 
       {/* Events List */}
