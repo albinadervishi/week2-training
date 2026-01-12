@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import toast from "react-hot-toast"
 import validator from "validator"
-import { useSearchParams, useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { FiEye, FiEyeOff } from "react-icons/fi"
-// import { useGoogleLogin } from "@react-oauth/google";
 
 import Loader from "../../components/loader"
 
@@ -17,7 +16,6 @@ export default function Signin() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      {/* Left Side - Explanation (50%) */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-50 p-12 items-center justify-center border-r border-gray-200">
         <div className="max-w-lg">
           <div className="mb-10">
@@ -25,7 +23,6 @@ export default function Signin() {
             <p className="text-gray-600">Your Event Management Platform</p>
           </div>
 
-          {/* Email Check Explanation */}
           {!email && !forgotPassword && (
             <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
               <div className="mb-6">
@@ -83,7 +80,6 @@ export default function Signin() {
             </div>
           )}
 
-          {/* Signup Explanation */}
           {!userExists && email && !forgotPassword && (
             <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
               <div className="mb-6">
@@ -137,7 +133,6 @@ export default function Signin() {
             </div>
           )}
 
-          {/* Signin Explanation */}
           {userExists && email && !forgotPassword && (
             <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
               <div className="mb-6">
@@ -165,7 +160,6 @@ export default function Signin() {
             </div>
           )}
 
-          {/* Forgot Password Explanation */}
           {forgotPassword && (
             <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
               <div className="mb-6">
@@ -218,13 +212,10 @@ export default function Signin() {
   )
 }
 
-// Email Check Component
 const EmailCheck = ({ setEmail, setUserExists }) => {
   const [loading, setLoading] = useState(false)
   const [email, setEmailValue] = useState("")
   const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
 
   const handleSubmit = async e => {
     try {
@@ -311,80 +302,8 @@ const EmailCheckAgency_REMOVED = ({ setEmail, setUserExists }) => {
   const [loading, setLoading] = useState(false)
   const [email, setEmailValue] = useState("")
   const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-
-  // const redirect = searchParams.get("redirect");
 
   const { agency } = store()
-
-  // console.log("agency", agency);
-
-  // const handleGoogleConnect = useGoogleLogin({
-  //   scope: "openid email profile",
-  //   onSuccess: async (tokenResponse) => {
-  //     if (typeof window !== "undefined" && window.trackSigninStart) window.trackSigninStart();
-  //     handleGoogleSuccess(tokenResponse);
-  //   },
-  //   onError: (error) => handleGoogleError(error),
-  // });
-
-  // const handleGoogleError = () => {
-  //   toast.error("Error while signing in with Google");
-  // };
-
-  // const handleGoogleSuccess = async (credentialResponse) => {
-  //   console.log("credentialResponse", credentialResponse);
-  //   try {
-  //     let referral_by = searchParams.get("ref");
-  //     let utm_source = searchParams.get("utm_source");
-  //     let utm_from = searchParams.get("utm_from");
-
-  //     if (!referral_by) {
-  //       const redirectParam = searchParams.get("redirect");
-  //       if (redirectParam) {
-  //         const redirectUrl = new URL(decodeURIComponent(redirectParam), window.location.origin);
-  //         const redirectParams = new URLSearchParams(redirectUrl.search);
-  //         referral_by = redirectParams.get("ref");
-  //         utm_source = redirectParams.get("utm_source");
-  //         utm_from = redirectParams.get("utm_from");
-  //       }
-  //     }
-
-  //     const { user, token, isNewUser } = await api.post(`/user/auth/google`, {
-  //       access_token: credentialResponse.access_token,
-  //       referral_by: referral_by,
-  //       waalego_utm_source: utm_source,
-  //       waalego_utm_from: utm_from,
-  //       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //     });
-
-  //     if (user) dispatch(setUser(user));
-  //     if (token) api.setToken(token);
-
-  //     // Track Google auth success
-  //     if (typeof window !== "undefined") {
-  //       if (isNewUser) {
-  //         if (window.onSignupSuccess) window.onSignupSuccess("google");
-  //         if (window.gtag) {
-  //           window.gtag("event", "sign_up", { method: "google_oauth", event_category: "engagement", event_label: "user_registration" });
-  //         }
-  //       } else {
-  //         if (window.onSigninSuccess) window.onSigninSuccess("google");
-  //       }
-  //     }
-
-  //     if (!isNewUser && redirect) {
-  //       navigate(redirect);
-  //       return;
-  //     }
-
-  //     navigate("/");
-  //   } catch (e) {
-  //     console.log("e", e);
-  //     toast.error(e.code);
-  //   }
-  // };
 
   const handleSubmit = async e => {
     try {
