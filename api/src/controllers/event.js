@@ -197,7 +197,7 @@ router.post("/", passport.authenticate("user", { session: false }), async (req, 
     });
 
     // 📚 201 = Created (new resource was created successfully)
-    return res.status(201).send({ ok: true, data: event });
+    return res.status(200).send({ ok: true, data: event });
   } catch (error) {
     capture(error);
     res.status(500).send({ ok: false, code: ERROR_CODES.SERVER_ERROR, error });
@@ -313,6 +313,46 @@ router.put("/:id", passport.authenticate(["user", "admin"], { session: false }),
   }
 });
 
+router.post("/:id/duplicate", passport.authenticate(["user", "admin"], { session: false }), async (req, res) => {
+  try {
+    const originalEvent = await EventObject.findById(req.params.id);
+    if (!originalEvent) return res.status(404).send({ ok: false, code: ERROR_CODES.NOT_FOUND });
+
+    const isOwner = originalEvent.organizer_id.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).send({ ok: false, code: ERROR_CODES.FORBIDDEN });
+    }
+
+    const {
+      _id,
+      organizer_id,
+      organizer_name,
+      organizer_email,
+      created_at,
+      updated_at,
+      available_spots,
+      ...eventData
+    } = originalEvent.toObject();
+
+    const duplicateEvent = await EventObject.create({
+      ...eventData,
+      title: `Copy of ${originalEvent.title}`,
+      status: "draft",
+      available_spots: originalEvent.capacity || 0,
+      organizer_id: req.user._id,
+      organizer_name: req.user.name,
+      organizer_email: req.user.email,
+    });
+
+    return res.status(201).send({ ok: true, data: duplicateEvent });
+  } catch (error) {
+    capture(error);
+    res.status(500).send({ ok: false, code: ERROR_CODES.SERVER_ERROR, error });
+  }
+});
+
 /**
  * DELETE /event/:id - Delete event (AUTHENTICATED, OWNER OR ADMIN)
  *
@@ -322,7 +362,6 @@ router.delete("/:id", passport.authenticate(["user", "admin"], { session: false 
   try {
     const event = await EventObject.findById(req.params.id);
     if (!event) return res.status(404).send({ ok: false, code: ERROR_CODES.NOT_FOUND });
-
 
     await EventObject.findByIdAndDelete(req.params.id);
 
