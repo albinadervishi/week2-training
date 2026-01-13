@@ -27,7 +27,6 @@ export default function MyEvents() {
   const [loading, setLoading] = useState(true)
   const [modalState, dispatch] = useReducer(modalReducer, { isOpen: false })
   const [filter, setFilter] = useState("all")
-  const [temp, setTemp] = useState(null)
   const navigate = useNavigate()
 
   const getData = useCallback(() => {
@@ -90,23 +89,14 @@ export default function MyEvents() {
 
   const duplicateEvent = async event => {
     try {
-      const { _id, organizer_id, organizer_name, organizer_email, created_at, updated_at, available_spots, ...eventData } = event
+      const { ok, data, code } = await api.post(`/event/${event._id}/duplicate`)
 
-      const duplicateData = {
-        ...eventData,
-        title: `Copy of ${event.title}`,
-        status: "published",
-        available_spots: event.capacity || 0
-      }
+      if (!ok) return
 
-      const { ok, data } = await api.post("/event", duplicateData)
-
-      if (!ok) throw new Error("Failed to duplicate event")
-      toast.success("Event duplicated! Add more details to publish it.")
+      toast.success("Event duplicated successfully!")
       getData()
     } catch (error) {
-      console.error(error)
-      toast.error("Failed to duplicate event")
+      toast.error("Unable to duplicate event. Please check your connection and try again.")
     }
   }
 
