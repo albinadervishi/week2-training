@@ -8,6 +8,7 @@ import EventCard from "@/scenes/events/components/EventCard"
 export default function ListView() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [totalEvents, setTotalEvents] = useState(0)
   const [filters, setFilters] = useState({
     search: "",
     category: "",
@@ -99,22 +100,6 @@ export default function ListView() {
               onChange={e => setFilters({ ...filters, search: e.target.value })}
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              value={filters.category}
-              onChange={e => setFilters({ ...filters, category: e.target.value })}
-            >
-              <option value="">All Categories</option>
-              <option value="conference">Conference</option>
-              <option value="workshop">Workshop</option>
-              <option value="seminar">Seminar</option>
-              <option value="networking">Networking</option>
-              <option value="social">Social</option>
-              <option value="other">Other</option>
-            </select>
-          </div> */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
             <input
@@ -124,6 +109,28 @@ export default function ListView() {
               value={filters.city}
               onChange={e => setFilters({ ...filters, city: e.target.value })}
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
+            <div className="flex gap-2">
+              <select
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                value={filters.sort.field}
+                onChange={e => setFilters({ ...filters, sort: { ...filters.sort, field: e.target.value } })}
+              >
+                <option value="start_date">Date</option>
+                <option value="price">Price</option>
+                <option value="capacity">Capacity</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => setFilters({ ...filters, sort: { ...filters.sort, order: filters.sort.order === 1 ? -1 : 1 } })}
+                className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                title={filters.sort.order === 1 ? "Ascending" : "Descending"}
+              >
+                {filters.sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
+              </button>
+            </div>
           </div>
           <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             Search Events
@@ -157,27 +164,6 @@ export default function ListView() {
                 {category}
               </button>
             ))}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
-            <div className="flex gap-2">
-              <select
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={filters.sort.field}
-                onChange={e => setFilters({ ...filters, sort: { ...filters.sort, field: e.target.value } })}
-              >
-                <option value="start_date">Date</option>
-                <option value="price">Price</option>
-                <option value="capacity">Capacity</option>
-              </select>
-              <button
-                type="button"
-                onClick={() => setFilters({ ...filters, sort: { ...filters.sort, order: filters.sort.order === 1 ? -1 : 1 } })}
-                className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                title={filters.sort.order === 1 ? "Ascending" : "Descending"}
-              >
-                {filters.sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
-              </button>
-            </div>
           </div>
         </div>
       </form>
