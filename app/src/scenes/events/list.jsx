@@ -7,12 +7,16 @@ import toast from "react-hot-toast"
 export default function ListView() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({ search: "", category: "", city: "" })
-  const [sort, setSort] = useState({ field: "start_date", order: 1 })
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "",
+    city: "",
+    sort: { field: "start_date", order: 1 }
+  })
 
   useEffect(() => {
     fetchEvents()
-  }, [sort])
+  }, [filters])
 
   const fetchEvents = async () => {
     try {
@@ -21,7 +25,7 @@ export default function ListView() {
         search: filters.search,
         category: filters.category,
         city: filters.city,
-        sort: { [sort.field]: sort.order },
+        sort: { [filters.sort.field]: filters.sort.order },
         per_page: 20,
         page: 1
       })
@@ -124,8 +128,8 @@ export default function ListView() {
             <div className="flex gap-2">
               <select
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                value={sort.field}
-                onChange={e => setSort({ ...sort, field: e.target.value })}
+                value={filters.sort.field}
+                onChange={e => setFilters({ ...filters, sort: { ...filters.sort, field: e.target.value } })}
               >
                 <option value="start_date">Date</option>
                 <option value="price">Price</option>
@@ -133,11 +137,11 @@ export default function ListView() {
               </select>
               <button
                 type="button"
-                onClick={() => setSort({ ...sort, order: sort.order === 1 ? -1 : 1 })}
+                onClick={() => setFilters({ ...filters, sort: { ...filters.sort, order: filters.sort.order === 1 ? -1 : 1 } })}
                 className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                title={sort.order === 1 ? "Ascending" : "Descending"}
+                title={filters.sort.order === 1 ? "Ascending" : "Descending"}
               >
-                {sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
+                {filters.sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
               </button>
             </div>
           </div>
