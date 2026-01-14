@@ -16,6 +16,7 @@ export default function EditTab({ event, fetchEvent }) {
     address: "",
     city: "",
     country: "France",
+    timezone: "Europe/Paris",
     capacity: 0,
     price: 0,
     currency: "EUR",
@@ -34,6 +35,7 @@ export default function EditTab({ event, fetchEvent }) {
         address: event.address || "",
         city: event.city || "",
         country: event.country || "France",
+        timezone: event.timezone || "Europe/Paris",
         capacity: event.capacity || 0,
         price: event.price || 0,
         currency: event.currency || "EUR",
@@ -42,6 +44,13 @@ export default function EditTab({ event, fetchEvent }) {
       })
     }
   }, [event])
+
+  useEffect(() => {
+    if (!formData.timezone) {
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      setFormData(prev => ({ ...prev, timezone: userTimezone }))
+    }
+  }, [])
 
   const handleChange = e => {
     const { name, value } = e.target
