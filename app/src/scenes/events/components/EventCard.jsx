@@ -45,12 +45,10 @@ export default function EventCard({ event }) {
             </span>
           </div>
 
-          {event.venue && (
+          {(event.venue || event.city) && (
             <div className="flex items-center">
               <AiOutlineEnvironment className="w-4 h-4 mr-2" />
-              <span className="line-clamp-1">
-                {event.venue}, {event.city}
-              </span>
+              <span className="line-clamp-1">{[event.venue, event.city].filter(Boolean).join(", ")}</span>
             </div>
           )}
 
