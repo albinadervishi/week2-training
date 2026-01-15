@@ -11,6 +11,7 @@ import Account from "@/scenes/account"
 import EventView from "@/scenes/events/view"
 import MyEvents from "@/scenes/my-events"
 import MyRegistrations from "@/scenes/my-registrations"
+import PublicEventView from "@/scenes/events/view/publicEventView"
 
 import Navbar from "@/components/NavBar"
 import TopBar from "@/components/TopBar"
@@ -32,6 +33,7 @@ export default function App() {
         <Route element={<AuthLayout />}>
           <Route path="/auth/*" element={<Auth />} />
         </Route>
+        <Route path="/public/event/:id" element={<PublicEventView />} />
         <Route element={<UserLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/week1-reference" element={<Week1Reference />} />
