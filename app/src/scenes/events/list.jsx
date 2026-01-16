@@ -17,7 +17,11 @@ export default function ListView() {
   })
 
   useEffect(() => {
-    fetchEvents()
+    const timeoutId = setTimeout(() => {
+      fetchEvents()
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
   }, [filters])
 
   const fetchEvents = async () => {
@@ -28,7 +32,7 @@ export default function ListView() {
         category: filters.category,
         city: filters.city,
         sort: { [filters.sort.field]: filters.sort.order },
-        per_page: 20,
+        per_page: 10,
         page: 1
       })
 
