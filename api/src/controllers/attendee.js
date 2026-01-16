@@ -51,7 +51,10 @@ router.post("/register", passport.authenticate("user", { session: false }), asyn
     }
 
     // Generate ticket number
-    const ticket_number = `TKT-${event_id.toString().slice(-6).toUpperCase()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    const ticket_number = `TKT-${event_id.toString().slice(-6).toUpperCase()}-${crypto
+      .randomBytes(4)
+      .toString("hex")
+      .toUpperCase()}`;
 
     // Create attendee
     const attendee = await AttendeeObject.create({
@@ -84,7 +87,7 @@ router.post("/register", passport.authenticate("user", { session: false }), asyn
 
 /**
  * POST /attendee/my-registrations/search - Search user's own registrations
- * 
+ *
  * 📚 WHY /search suffix?
  * - Makes it clear this endpoint searches, not creates
  * - Consistent with POST /event/search and /event/my-events/search pattern
@@ -107,10 +110,7 @@ router.post("/my-registrations/search", passport.authenticate("user", { session:
     const limit = per_page || 20;
     const offset = page ? (page - 1) * limit : 0;
 
-    const data = await AttendeeObject.find(query)
-      .skip(offset)
-      .limit(limit)
-      .sort({ created_at: -1 });
+    const data = await AttendeeObject.find(query).skip(offset).limit(limit).sort({ created_at: -1 });
 
     const total = await AttendeeObject.countDocuments(query);
 
@@ -172,7 +172,9 @@ router.post("/event/:event_id", passport.authenticate("user", { session: false }
       return res.status(403).send({ ok: false, code: "FORBIDDEN" });
     }
 
-    let query = { event_id };
+    const eventIdString = event_id.toString();
+
+    let query = { event_id: eventIdString };
 
     if (status) query.status = status;
 
@@ -191,11 +193,7 @@ router.post("/event/:event_id", passport.authenticate("user", { session: false }
     const limit = per_page || 10;
     const offset = page ? (page - 1) * limit : 0;
 
-    const data = await AttendeeObject.find(query)
-      .skip(offset)
-      .limit(limit)
-      .sort({ created_at: -1 });
-
+    const data = await AttendeeObject.find(query).skip(offset).limit(limit).sort({ created_at: -1 });
     const total = await AttendeeObject.countDocuments(query);
 
     return res.status(200).send({ ok: true, data, total });
@@ -275,4 +273,3 @@ router.post("/admin/search", passport.authenticate("admin", { session: false }),
 });
 
 module.exports = router;
-
