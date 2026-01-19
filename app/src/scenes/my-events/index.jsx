@@ -27,7 +27,6 @@ export default function MyEvents() {
   const [loading, setLoading] = useState(true)
   const [modalState, dispatch] = useReducer(modalReducer, { isOpen: false })
   const [filter, setFilter] = useState("all")
-  const [temp, setTemp] = useState(null)
   const navigate = useNavigate()
 
   const getData = useCallback(() => {
@@ -85,6 +84,19 @@ export default function MyEvents() {
           toast.error("Failed to delete event")
         }
       })
+    }
+  }
+
+  const duplicateEvent = async event => {
+    try {
+      const { ok, data, code } = await api.post(`/event/${event._id}/duplicate`)
+
+      if (!ok) return
+
+      toast.success("Event duplicated successfully!")
+      getData()
+    } catch (error) {
+      toast.error("Unable to duplicate event. Please check your connection and try again.")
     }
   }
 
@@ -264,6 +276,22 @@ export default function MyEvents() {
                               />
                             </svg>
                             View Attendees
+                          </button>
+                        )}
+                      </Menu.Item>
+
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button onClick={() => duplicateEvent(event)} className={`${active ? "bg-gray-100" : ""} flex items-center w-full px-4 py-2 text-sm text-gray-700`}>
+                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Duplicate Event
                           </button>
                         )}
                       </Menu.Item>
