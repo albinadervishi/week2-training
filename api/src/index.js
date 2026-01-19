@@ -13,16 +13,18 @@ initSentry(app);
 
 if (ENVIRONMENT === "development") {
   // Filter out socket.io requests from logs (not used in this project)
-  app.use(morgan("tiny", {
-    skip: (req, res) => req.url.includes("/socket.io")
-  }));
+  app.use(
+    morgan("tiny", {
+      skip: (req, res) => req.url.includes("/socket.io"),
+    }),
+  );
 }
 
 require("./services/mongo");
 
 app.use(cors({ credentials: true, origin: [APP_URL, ADMIN_URL] }));
 app.use(cookieParser());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const lastDeployedAt = new Date();
