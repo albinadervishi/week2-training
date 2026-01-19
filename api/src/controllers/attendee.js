@@ -45,11 +45,13 @@ router.post("/register", passport.authenticate("user", { session: false }), asyn
     }
 
     // Check if user already registered
-    const existingAttendee = await AttendeeObject.findOne({ event_id, user_id: req.user._id });
+    const existingAttendee = await AttendeeObject.findOne({
+      event_id: event_id.toString(),
+      user_id: req.user._id.toString(),
+    });
     if (existingAttendee) {
       return res.status(400).send({ ok: false, code: "ALREADY_REGISTERED" });
     }
-
     // Generate ticket number
     const ticket_number = `TKT-${event_id.toString().slice(-6).toUpperCase()}-${crypto
       .randomBytes(4)
@@ -58,10 +60,17 @@ router.post("/register", passport.authenticate("user", { session: false }), asyn
 
     // Create attendee
     const attendee = await AttendeeObject.create({
-      event_id,
-      user_id: req.user._id,
+      event_id: event_id.toString(),
+      user_id: req.user._id.toString(),
       name: req.user.name,
       email: req.user.email,
+      event_title: event.title,
+      event_start_date: event.start_date,
+      event_end_date: event.end_date,
+      event_city: event.city,
+      event_country: event.country,
+      event_venue: event.venue,
+      event_image_url: event.image_url || "",
       ticket_number,
       status: event.requires_approval ? "pending" : "confirmed",
       payment_status: event.price > 0 ? "pending" : "free",
@@ -96,15 +105,18 @@ router.post("/register", passport.authenticate("user", { session: false }), asyn
 router.post("/my-registrations/search", passport.authenticate("user", { session: false }), async (req, res) => {
   try {
     const { search, status, per_page, page } = req.body;
-    // Security: user_id is set from authenticated user, not from request body
-    let query = { user_id: req.user._id };
+
+    let query = { user_id: req.user._id.toString() };
 
     if (status) query.status = status;
 
     if (search) {
       const searchValue = search.replace(/[#-.]|[[-^]|[?|{}]/g, "\\$&");
-      // Search in ticket number or populated event title
-      query.ticket_number = { $regex: searchValue, $options: "i" };
+      // Search in ticket number or event title
+      query.$or = [
+        { ticket_number: { $regex: searchValue, $options: "i" } },
+        { event_title: { $regex: searchValue, $options: "i" } },
+      ];
     }
 
     const limit = per_page || 20;
@@ -135,7 +147,7 @@ router.delete("/:id", passport.authenticate("user", { session: false }), async (
     }
 
     // Get event to update available spots
-    const event = await EventObject.findById(attendee.event_id);
+    const event = await EventObject.findById(attendee.event_id.toString());
 
     // Update status to cancelled
     attendee.status = "cancelled";
@@ -172,7 +184,7 @@ router.post("/event/:event_id", passport.authenticate("user", { session: false }
       return res.status(403).send({ ok: false, code: "FORBIDDEN" });
     }
 
-    let query = { event_id };
+    let query = { event_id: event_id.toString() };
 
     if (status) query.status = status;
 
@@ -213,7 +225,7 @@ router.put("/:id/status", passport.authenticate("user", { session: false }), asy
     }
 
     // Check if user is the event organizer
-    const event = await EventObject.findById(attendee.event_id);
+    const event = await EventObject.findById(attendee.event_id.toString());
     if (!event || event.organizer_id.toString() !== req.user._id.toString()) {
       return res.status(403).send({ ok: false, code: "FORBIDDEN" });
     }
