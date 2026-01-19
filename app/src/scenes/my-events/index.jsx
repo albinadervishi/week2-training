@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useReducer } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { AiOutlineCalendar, AiOutlinePlus } from "react-icons/ai"
 import { Menu } from "@headlessui/react"
@@ -6,98 +6,31 @@ import api from "@/services/api"
 import toast from "react-hot-toast"
 import CreateEventModal from "@/components/CreateEventModal"
 
-const modalReducer = (state, action) => {
-  switch (action.type) {
-    case "OPEN":
-      return { ...state, isOpen: true }
-    case "CLOSE":
-      return { ...state, isOpen: false }
-    default:
-      return state
-  }
-}
-
-const getEventsFromApi = () => {
-  return api.post("/event/my-events/search", { per_page: 50, page: 1 })
-}
-
 export default function MyEvents() {
   const [events, setEvents] = useState([])
-  const [allEvents, setAllEvents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [modalState, dispatch] = useReducer(modalReducer, { isOpen: false })
-  const [filter, setFilter] = useState("all")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filter, setFilter] = useState("")
   const navigate = useNavigate()
 
-  const getData = useCallback(() => {
-    console.log("getData called")
-    setLoading(true)
-    getEventsFromApi().then(response => {
-      console.log("response", response)
-      if (response.ok) {
-        console.log("data", response.data)
-        setAllEvents(response.data)
-        setEvents(response.data)
-        setLoading(false)
-      } else {
-        if (response.code) {
-          console.log("error code", response.code)
-          toast.error("Could not load your events")
-          setLoading(false)
-        } else {
-          console.log("unknown error")
-          setLoading(false)
-        }
-      }
-    })
-  }, [])
+  const getData = async () => {
+    try {
+      const { ok, data } = await api.post("/event/my-events/search", { per_page: 50, page: 1, status: filter })
+      if (!ok) return
+      setEvents(data)
+    } catch (error) {
+      toast.error("Could not load your events")
+    }
+  }
 
   useEffect(() => {
     getData()
   }, [])
 
-  const memoizedEvents = useMemo(() => {
-    console.log("filtering events")
-    return events
-  }, [events])
-
-  useEffect(() => {
-    console.log("filter changed", filter)
-    if (filter === "all") {
-      setEvents(allEvents)
-    } else {
-      const filtered = allEvents.filter(e => e.status === filter)
-      setEvents(filtered)
-    }
-  }, [filter, allEvents])
-
-  const doDelete = eventId => {
-    console.log("deleting", eventId)
-    if (confirm("Are you sure you want to delete this event?")) {
-      api.delete(`/event/${eventId}`).then(response => {
-        console.log("delete response", response)
-        if (response.ok) {
-          toast.success("Event deleted successfully")
-          setEvents(events.filter(e => e._id !== eventId))
-          setAllEvents(allEvents.filter(e => e._id !== eventId))
-        } else {
-          toast.error("Failed to delete event")
-        }
-      })
-    }
-  }
-
-  const duplicateEvent = async event => {
-    try {
-      const { ok, data, code } = await api.post(`/event/${event._id}/duplicate`)
-
-      if (!ok) return
-
-      toast.success("Event duplicated successfully!")
-      getData()
-    } catch (error) {
-      toast.error("Unable to duplicate event. Please check your connection and try again.")
-    }
+  const handleDelete = async eventId => {
+    if (!window.confirm("Are you sure ?")) return
+    await api.delete(`/event/${eventId}`)
+    toast.success("Event deleted successfully")
+    getData()
   }
 
   const formatDate = date => {
@@ -119,27 +52,6 @@ export default function MyEvents() {
     return <span className={`px-2 py-1 text-xs font-semibold rounded ${styles[status] || styles.draft}`}>{status.toUpperCase()}</span>
   }
 
-  const unusedFunction = () => {
-    console.log("This function is never called")
-    return null
-  }
-
-  const anotherUnusedFunction = data => {
-    const x = data.map(item => item.title)
-    return x
-  }
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -148,14 +60,14 @@ export default function MyEvents() {
             <h1 className="text-3xl font-bold text-gray-900">My Events</h1>
             <p className="text-gray-600 mt-2">Events you've created and organized</p>
           </div>
-          <button onClick={() => dispatch({ type: "OPEN" })} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+          <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
             <AiOutlinePlus className="w-5 h-5" />
             Create Event
           </button>
         </div>
 
         <div className="mt-4 flex gap-2">
-          <button onClick={() => setFilter("all")} className={`px-3 py-1 rounded ${filter === "all" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}>
+          <button onClick={() => setFilter("")} className={`px-3 py-1 rounded ${filter === "" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}>
             All
           </button>
           <button onClick={() => setFilter("draft")} className={`px-3 py-1 rounded ${filter === "draft" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}>
@@ -167,7 +79,7 @@ export default function MyEvents() {
         </div>
       </div>
 
-      {memoizedEvents.length === 0 ? (
+      {events.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
             <AiOutlineCalendar className="w-8 h-8 text-gray-400" />
@@ -181,7 +93,7 @@ export default function MyEvents() {
         </div>
       ) : (
         <div className="space-y-4">
-          {memoizedEvents.map(event => (
+          {events.map(event => (
             <div key={event._id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -280,27 +192,11 @@ export default function MyEvents() {
                         )}
                       </Menu.Item>
 
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button onClick={() => duplicateEvent(event)} className={`${active ? "bg-gray-100" : ""} flex items-center w-full px-4 py-2 text-sm text-gray-700`}>
-                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                              />
-                            </svg>
-                            Duplicate Event
-                          </button>
-                        )}
-                      </Menu.Item>
-
                       <div className="border-t border-gray-100 my-1"></div>
 
                       <Menu.Item>
                         {({ active }) => (
-                          <button onClick={() => doDelete(event._id)} className={`${active ? "bg-red-50" : ""} flex items-center w-full px-4 py-2 text-sm text-red-600`}>
+                          <button onClick={() => handleDelete(event._id)} className={`${active ? "bg-red-50" : ""} flex items-center w-full px-4 py-2 text-sm text-red-600`}>
                             <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
@@ -323,9 +219,9 @@ export default function MyEvents() {
       )}
 
       <CreateEventModal
-        isOpen={modalState.isOpen}
+        isOpen={isModalOpen}
         onClose={() => {
-          dispatch({ type: "CLOSE" })
+          setIsModalOpen(false)
           getData()
         }}
       />
