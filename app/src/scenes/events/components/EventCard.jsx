@@ -33,7 +33,7 @@ export default function EventCard({ event }) {
           )}
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{event.title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 break-words min-w-0">{event.title}</h3>
 
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
 
