@@ -17,7 +17,10 @@ export default function ListView() {
   })
 
   useEffect(() => {
-    fetchEvents()
+    const timeoutId = setTimeout(() => {
+      fetchEvents()
+    }, 500)
+    return () => clearTimeout(timeoutId)
   }, [filters])
 
   const fetchEvents = async () => {
@@ -44,7 +47,10 @@ export default function ListView() {
 
   const handleSearch = e => {
     e.preventDefault()
-    fetchEvents()
+  }
+
+  const handleReset = () => {
+    setFilters({ search: "", category: "", city: "" })
   }
 
   if (loading) {
@@ -132,9 +138,19 @@ export default function ListView() {
               </button>
             </div>
           </div>
-          <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Search Events
-          </button>
+
+          <div className="flex gap-2 mt-4">
+            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              Search Events
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Reset
+            </button>
+          </div>
         </div>
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
