@@ -8,6 +8,8 @@ import EditTab from "./edit"
 import AttendeesTab from "./attendees"
 import PaymentsTab from "./payments"
 import RawView from "./raw"
+import { HiOutlineShare } from "react-icons/hi"
+import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp, FaLink } from "react-icons/fa"
 
 export default function EventView() {
   const { id } = useParams()
@@ -16,6 +18,7 @@ export default function EventView() {
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
+  const [showShareMenu, setShowShareMenu] = useState(false)
 
   useEffect(() => {
     fetchEvent()
@@ -31,6 +34,29 @@ export default function EventView() {
       navigate("/")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleShare = platform => {
+    const shareUrl = `${window.location.origin}/public/event/${id}`
+    const shareText = `Check out this event: ${event.title}`
+
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`,
+      link: shareUrl
+    }
+
+    if (platform === "link") {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success("Link copied to clipboard!")
+        setShowShareMenu(false)
+      })
+    } else {
+      window.open(shareUrls[platform], "_blank", "width=600,height=400")
+      setShowShareMenu(false)
     }
   }
 
@@ -61,10 +87,47 @@ export default function EventView() {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
-      </div>
 
+        <div className="relative">
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 transition-colors"
+          >
+            <HiOutlineShare className="w-5 h-5" />
+            Share
+          </button>
+
+          {showShareMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+              <div className="py-1">
+                <button onClick={() => handleShare("facebook")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaFacebook className="w-5 h-5 text-blue-600" />
+                  Facebook
+                </button>
+                <button onClick={() => handleShare("twitter")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaTwitter className="w-5 h-5 text-blue-400" />
+                  Twitter
+                </button>
+                <button onClick={() => handleShare("linkedin")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaLinkedin className="w-5 h-5 text-blue-700" />
+                  LinkedIn
+                </button>
+                <button onClick={() => handleShare("whatsapp")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaWhatsapp className="w-5 h-5 text-green-500" />
+                  WhatsApp
+                </button>
+                <div className="border-t border-gray-200"></div>
+                <button onClick={() => handleShare("link")} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaLink className="w-5 h-5 text-gray-500" />
+                  Copy Link
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
         <div className="flex gap-8 pb-3">
