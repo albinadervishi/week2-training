@@ -16,7 +16,6 @@ export default function EventView() {
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
-  console.log("activeTab", activeTab)
 
   useEffect(() => {
     fetchEvent()

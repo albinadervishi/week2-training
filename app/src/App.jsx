@@ -68,7 +68,7 @@ const UserLayout = () => {
       api.setToken(token)
       setUser(user)
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setUser(null)
     } finally {
       setLoading(false)
