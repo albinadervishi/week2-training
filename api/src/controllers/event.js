@@ -54,15 +54,14 @@ router.post("/search", async (req, res) => {
 
       // 📚 $or: Search across multiple fields
       // options: "i" = case insensitive (Test, test, TEST all match)
-      query = {
-        ...query,
-        $or: [
-          { title: { $regex: searchValue, $options: "i" } },
-          { description: { $regex: searchValue, $options: "i" } },
-          { venue: { $regex: searchValue, $options: "i" } },
-          { city: { $regex: searchValue, $options: "i" } },
-        ],
-      };
+
+      //text search first
+      query.$text = { $search: searchValue };
+      //fallback to regex
+      query.$or = [
+        { title: { $regex: searchValue, $options: "i" } },
+        { description: { $regex: searchValue, $options: "i" } },
+      ];
     }
 
     if (category) query.category = category;

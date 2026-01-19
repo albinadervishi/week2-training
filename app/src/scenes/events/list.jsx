@@ -30,7 +30,7 @@ export default function ListView() {
         category: filters.category,
         city: filters.city,
         sort: { [filters.sort.field]: filters.sort.order },
-        per_page: 20,
+        per_page: 10,
         page: 1
       })
 

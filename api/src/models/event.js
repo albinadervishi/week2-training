@@ -55,6 +55,11 @@ const Schema = new mongoose.Schema(
 // Index for searching
 Schema.index({ title: "text", description: "text" });
 Schema.index({ start_date: 1, status: 1 });
+Schema.index({ category: 1 });
+Schema.index({ city: 1 });
+Schema.index({ status: 1, start_date: 1 });
+Schema.index({ price: 1 });
+Schema.index({ capacity: 1 });
 
 const OBJ = mongoose.model(MODELNAME, Schema);
 module.exports = OBJ;
