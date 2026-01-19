@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 import { AiOutlineCalendar, AiOutlineEnvironment, AiOutlineUser, AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai"
 import api from "@/services/api"
 import toast from "react-hot-toast"
@@ -17,7 +16,10 @@ export default function ListView() {
   })
 
   useEffect(() => {
-    fetchEvents()
+    const timeoutId = setTimeout(() => {
+      fetchEvents()
+    }, 500)
+    return () => clearTimeout(timeoutId)
   }, [filters])
 
   const fetchEvents = async () => {
@@ -44,7 +46,10 @@ export default function ListView() {
 
   const handleSearch = e => {
     e.preventDefault()
-    fetchEvents()
+  }
+
+  const handleReset = () => {
+    setFilters({ search: "", category: "", city: "" })
   }
 
   if (loading) {
@@ -132,9 +137,19 @@ export default function ListView() {
               </button>
             </div>
           </div>
-          <button type="submit" className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Search Events
-          </button>
+
+          <div className="flex gap-2 mt-4">
+            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              Search Events
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Reset
+            </button>
+          </div>
         </div>
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
@@ -164,6 +179,28 @@ export default function ListView() {
                 {category}
               </button>
             ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
+              <div className="flex gap-2">
+                <select
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={sort.field}
+                  onChange={e => setSort({ ...sort, field: e.target.value })}
+                >
+                  <option value="start_date">Date</option>
+                  <option value="price">Price</option>
+                  <option value="capacity">Capacity</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setSort({ ...sort, order: sort.order === 1 ? -1 : 1 })}
+                  className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  title={sort.order === 1 ? "Ascending" : "Descending"}
+                >
+                  {sort.order === 1 ? <AiOutlineSortAscending className="w-5 h-5 text-gray-600" /> : <AiOutlineSortDescending className="w-5 h-5 text-gray-600" />}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </form>

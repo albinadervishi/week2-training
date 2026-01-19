@@ -33,7 +33,7 @@ export default function EventCard({ event }) {
           )}
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{event.title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 break-words min-w-0">{event.title}</h3>
 
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
 
@@ -45,12 +45,10 @@ export default function EventCard({ event }) {
             </span>
           </div>
 
-          {event.venue && (
+          {(event.venue || event.city) && (
             <div className="flex items-center">
               <AiOutlineEnvironment className="w-4 h-4 mr-2" />
-              <span className="line-clamp-1">
-                {event.venue}, {event.city}
-              </span>
+              <span className="line-clamp-1">{[event.venue, event.city].filter(Boolean).join(", ")}</span>
             </div>
           )}
 
@@ -61,19 +59,26 @@ export default function EventCard({ event }) {
             </div>
           )}
 
-          {event.capacity > 0 && (
-            <div className="mt-2 pt-2 border-t border-gray-200">
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            {event.capacity > 0 ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Available spots</span>
+                  <span className="text-xs font-semibold text-gray-900">
+                    {event.capacity - event.available_spots} / {event.capacity}
+                  </span>
+                </div>
+                <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${((event.capacity - event.available_spots) / event.capacity) * 100}%` }}></div>
+                </div>
+              </>
+            ) : (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Available spots</span>
-                <span className="text-xs font-semibold text-gray-900">
-                  {event.capacity - event.available_spots} / {event.capacity}
-                </span>
+                <span className="text-xs font-semibold text-gray-900">Unlimited</span>
               </div>
-              <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${(event.available_spots / event.capacity) * 100}%` }}></div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </Link>
