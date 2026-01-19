@@ -47,6 +47,7 @@ const Schema = new mongoose.Schema(
     // Registration
     registration_deadline: { type: Date },
     requires_approval: { type: Boolean, default: false },
+    timezone: { type: String, default: "UTC" },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 );

@@ -166,7 +166,7 @@ router.post("/", passport.authenticate("user", { session: false }), async (req, 
     // 📚 Validation: Check required fields
     // 400 = Bad Request (client sent invalid data)
     if (!title || !start_date) {
-      return res.status(400).send({ ok: false, code: "TITLE_AND_START_DATE_REQUIRED" });
+      return res.status(400).send({ ok: false, code: ERROR_CODES.TITLE_AND_START_DATE_REQUIRED });
     }
 
     // 📚 Security: Set organizer from authenticated user
@@ -287,7 +287,7 @@ router.put("/:id", passport.authenticate(["user", "admin"], { session: false }),
     const isAdmin = req.user.role === "admin";
 
     if (!isOwner && !isAdmin) {
-      return res.status(403).send({ ok: false, code: "FORBIDDEN" });
+      return res.status(403).send({ ok: false, code: ERROR_CODES.FORBIDDEN });
     }
 
     const updates = req.body;
