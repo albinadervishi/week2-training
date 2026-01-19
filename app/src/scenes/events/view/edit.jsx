@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import api from "@/services/api"
 import toast from "react-hot-toast"
+import FileInput from "@/components/file-input"
 
 export default function EditTab({ event, fetchEvent }) {
   const { id } = useParams()
@@ -165,6 +166,18 @@ export default function EditTab({ event, fetchEvent }) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
 
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Event Image</label>
+              <FileInput
+                name="image_url"
+                value={formData.image_url}
+                onChange={e => {
+                  const url = Array.isArray(e.target.value) ? e.target.value[0] : e.target.value
+                  setFormData({ ...formData, image_url: url || "" })
+                }}
+                folder="/events"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Event Title <span className="text-red-500">*</span>
