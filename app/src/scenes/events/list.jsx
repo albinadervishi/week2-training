@@ -10,16 +10,19 @@ export default function ListView() {
   const [filters, setFilters] = useState({ search: "", category: "", city: "" })
 
   useEffect(() => {
-    fetchEvents()
-  }, [])
+    const timeoutId = setTimeout(() => {
+      fetchEvents()
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [filters])
 
-  const fetchEvents = async (filterParams = filters) => {
+  const fetchEvents = async () => {
     try {
       setLoading(true)
       const { ok, data } = await api.post("/event/search", {
-        search: filterParams.search,
-        category: filterParams.category,
-        city: filterParams.city,
+        search: filters.search,
+        category: filters.category,
+        city: filters.city,
         per_page: 20,
         page: 1
       })
@@ -35,12 +38,10 @@ export default function ListView() {
 
   const handleSearch = e => {
     e.preventDefault()
-    fetchEvents()
   }
+
   const handleReset = () => {
-    const emptyFilters = { search: "", category: "", city: "" }
-    setFilters(emptyFilters)
-    fetchEvents(emptyFilters)
+    setFilters({ search: "", category: "", city: "" })
   }
 
   if (loading) {
